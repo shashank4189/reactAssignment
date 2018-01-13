@@ -1,9 +1,12 @@
 import { authHeader } from '../_helpers';
+import  axios  from 'axios';
+import _ from 'lodash'
 
 export const userService = {
     login,
     logout,
     register,
+    search,
     getAll,
     getById,
     update,
@@ -16,24 +19,40 @@ function login(username, password) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
     };
+    let result=[];
+    return axios({
+        url:'https://swapi.co/api/people/?search='+username,
+        method:'GET',
+        Headers:[]
+      }) .then(response => {
+        if (response) {
+            // store user details and jwt token in local storage to keep user logged in between page refreshes
+              result =_.filter(response.data.results, function(o) { 
+                return o.name.toLowerCase() == username.toLowerCase() && o.birth_year==password; 
+             });
+             if(result.length>0){
+            localStorage.setItem('user', JSON.stringify(result[0]));
+             }
+        }
 
-    return fetch('/users/authenticate', requestOptions)
-        .then(response => {
-            if (!response.ok) { 
-                return Promise.reject(response.statusText);
-            }
+        return result;
+      }).catch(error=>{
+      });
+}
 
-            return response.json();
-        })
-        .then(user => {
-            // login successful if there's a jwt token in the response
-            if (user && user.token) {
-                // store user details and jwt token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('user', JSON.stringify(user));
-            }
-
-            return user;
-        });
+function search(pageNo,value) {
+    let result=[];
+    let urlString ='';
+    if( value && value!=''){
+        urlString=   'https://swapi.co/api/planets/?page='+pageNo+'&search='+value
+    }else{
+        urlString=   'https://swapi.co/api/planets/?page='+pageNo
+    }
+    return axios({
+        url:urlString,
+        method:'GET',
+        Headers:[]
+    })
 }
 
 function logout() {

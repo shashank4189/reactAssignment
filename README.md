@@ -1,5 +1,5 @@
-# react-redux-registration-login-example
+** Stept to run this project**
 
-React + Redux - User Registration and Login Tutorial & Example
+1-  run npm install
 
-For documentation and further details go to http://jasonwatmore.com/post/2017/09/16/react-redux-user-registration-and-login-tutorial-example
+2-  run npm start

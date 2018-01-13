@@ -7,6 +7,7 @@ export const userActions = {
     login,
     logout,
     register,
+    search,
     getAll,
     delete: _delete
 };
@@ -18,8 +19,13 @@ function login(username, password) {
         userService.login(username, password)
             .then(
                 user => { 
+                    if(user.length>0){
                     dispatch(success(user));
-                    history.push('/');
+                    history.push('/Search');
+                    }else{
+            
+                        dispatch(alertActions.error('Invalid Credential'));
+                    }
                 },
                 error => {
                     dispatch(failure(error));
@@ -60,6 +66,30 @@ function register(user) {
     function success(user) { return { type: userConstants.REGISTER_SUCCESS, user } }
     function failure(error) { return { type: userConstants.REGISTER_FAILURE, error } }
 }
+
+function search(pageNo,value) {
+    return dispatch => {
+        dispatch(request(value));
+
+        return  userService.search(pageNo,value)
+            .then(
+                user => { 
+                   
+                    dispatch(success(user));
+                    return user;
+                },
+                error => {
+                    dispatch(failure(error));
+                    dispatch(alertActions.error(error));
+                }
+            );
+    };
+
+    function request(value) { return { type: userConstants.SEARCH_REQUEST, value } }
+    function success(value) { return { type: userConstants.SEARCH_SUCCESS, value } }
+    function failure(error) { return { type: userConstants.SEARCH_FAILURE_FAILURE, error } }
+}
+
 
 function getAll() {
     return dispatch => {
